@@ -35,6 +35,6 @@ Leave `status` out of the file: a new workflow starts as a draft, and a person t
 Repository secrets for the push job:
 
 - `POSTHOG_CLI_HOST`: the HTTPS URL of the PostHog instance. The CLI refuses plain `http` unless the host is loopback.
-  The demo instance runs on a dev box. A Cloudflare quick tunnel publishes only its workflows API path, so the runner reaches it without joining the tailnet.
+  The demo instance runs on a dev box. A Cloudflare quick tunnel makes it public, so the runner needs no network setup. The tunnel URL changes when it restarts, and this secret changes with it.
 - `POSTHOG_CLI_PROJECT_ID`: the project to push to.
 - `POSTHOG_CLI_API_KEY`: a project secret API key (`phs_...`) with the `hog_flow:write` scope.

@@ -45,8 +45,8 @@ jobs:
                   node-version: 24
                   cache: npm
             - run: npm ci
-            # POSTHOG_CLI_HOST is a public tunnel to the dev box that serves only the workflows API
-            # (/api/environments/<id>/hog_flows), and every request still needs the project secret key.
+            # POSTHOG_CLI_HOST is a public tunnel to the demo instance on a dev box. The push only calls
+            # /api/environments/<id>/hog_flows, and every request needs the project secret key.
             - name: posthog-workflows push
               env:
                   POSTHOG_CLI_HOST: ${{ secrets.POSTHOG_CLI_HOST }}
