@@ -2,7 +2,7 @@
 
 This repository declares [PostHog workflows](https://posthog.com/docs/workflows) in TypeScript with `@posthog/workflows`.
 A pull request checks every file, and a merge to `main` pushes it to PostHog.
-A pushed workflow is code-managed, so PostHog shows it read-only and links back to its file here.
+A pushed workflow is code-managed. PostHog links back to its file here, and edits made in PostHog stay in the editor until someone uses **Copy code** and commits the result.
 
 ## Layout
 
