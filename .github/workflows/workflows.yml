@@ -45,13 +45,8 @@ jobs:
                   node-version: 24
                   cache: npm
             - run: npm ci
-            # The PostHog instance is only reachable on the tailnet. The runner joins as an
-            # ephemeral node with a tag, and the tailnet policy decides what that tag can reach.
-            - uses: tailscale/github-action@d1b6cd204f8dceda5b3eaad7f1f767be390056cd # v4.2.0
-              with:
-                  oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-                  oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-                  tags: tag:posthog-workflows-demo-ci
+            # POSTHOG_CLI_HOST is a public tunnel to the dev box that serves only the workflows API
+            # (/api/environments/<id>/hog_flows), and every request still needs the project secret key.
             - name: posthog-workflows push
               env:
                   POSTHOG_CLI_HOST: ${{ secrets.POSTHOG_CLI_HOST }}

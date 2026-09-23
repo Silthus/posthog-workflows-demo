@@ -30,11 +30,11 @@ Leave `status` out of the file: a new workflow starts as a draft, and a person t
 | Event | Job | Secrets |
 | --- | --- | --- |
 | Pull request | `posthog-workflows check` on each file | none |
-| Push to `main` | joins the tailnet, then `posthog-workflows push` on each file | all below |
+| Push to `main` | `posthog-workflows push` on each file | all below |
 
 Repository secrets for the push job:
 
-- `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_SECRET`: a Tailscale OAuth client with the `auth_keys` scope that may assign `tag:posthog-workflows-demo-ci`.
 - `POSTHOG_CLI_HOST`: the HTTPS URL of the PostHog instance. The CLI refuses plain `http` unless the host is loopback.
+  The demo instance runs on a dev box. A Cloudflare quick tunnel publishes only its workflows API path, so the runner reaches it without joining the tailnet.
 - `POSTHOG_CLI_PROJECT_ID`: the project to push to.
 - `POSTHOG_CLI_API_KEY`: a project secret API key (`phs_...`) with the `hog_flow:write` scope.
