@@ -1,0 +1,63 @@
+name: Workflows as code
+
+on:
+    pull_request:
+    push:
+        branches: [main]
+
+permissions:
+    contents: read
+
+concurrency:
+    # Pushes to main queue up instead of racing, so the last merged commit is what PostHog runs.
+    group: workflows-${{ github.event_name }}-${{ github.ref }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+    check:
+        name: Check workflows
+        if: github.event_name == 'pull_request'
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: 24
+                  cache: npm
+            - run: npm ci
+            # No secrets here: check validates each file offline, so a pull request from a fork passes too.
+            - name: posthog-workflows check
+              run: |
+                  for file in workflows/*.ts; do
+                      npx posthog-workflows check "$file"
+                  done
+
+    push:
+        name: Push workflows
+        if: github.event_name == 'push'
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: 24
+                  cache: npm
+            - run: npm ci
+            # The PostHog instance is only reachable on the tailnet. The runner joins as an
+            # ephemeral node with a tag, and the tailnet policy decides what that tag can reach.
+            - uses: tailscale/github-action@d1b6cd204f8dceda5b3eaad7f1f767be390056cd # v4.2.0
+              with:
+                  oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+                  oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+                  tags: tag:posthog-workflows-demo-ci
+            - name: posthog-workflows push
+              env:
+                  POSTHOG_CLI_HOST: ${{ secrets.POSTHOG_CLI_HOST }}
+                  POSTHOG_CLI_PROJECT_ID: ${{ secrets.POSTHOG_CLI_PROJECT_ID }}
+                  POSTHOG_CLI_API_KEY: ${{ secrets.POSTHOG_CLI_API_KEY }}
+              run: |
+                  for file in workflows/*.ts; do
+                      npx posthog-workflows push "$file"
+                  done

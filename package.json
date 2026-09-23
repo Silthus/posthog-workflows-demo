@@ -1,0 +1,17 @@
+{
+    "name": "posthog-workflows-demo",
+    "version": "0.0.0",
+    "private": true,
+    "description": "PostHog workflows declared in TypeScript, checked on pull requests and pushed from main.",
+    "type": "module",
+    "scripts": {
+        "check": "for file in workflows/*.ts; do posthog-workflows check \"$file\" || exit 1; done",
+        "push": "for file in workflows/*.ts; do posthog-workflows push \"$file\" || exit 1; done"
+    },
+    "devDependencies": {
+        "@posthog/workflows": "file:vendor/posthog-workflows-0.0.0.tgz"
+    },
+    "engines": {
+        "node": ">=22.12"
+    }
+}
